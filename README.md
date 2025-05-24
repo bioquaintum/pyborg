@@ -200,6 +200,22 @@ sim_ca.close()
 
 ## Project Directory Structure
 
+The `pyborg` structure is designed to be modular and intuitive, organizing the code into directories that represent the main functionalities of a brain organoid simulator. Each directory encapsulates a specific area, from defining basic neural components and constructing the organoid, through simulating experimental interactions and plasticity, to analyzing and visualizing the generated data, with additional support from examples, tests, and documentation.
+
+*   **Root Files**: Located at the root of the project (the `pyborg` directory which is the main package), these include essential files such as `README.md` (project overview), `setup.py` (for package installation), `requirements.txt` (dependencies), `LICENSE`, `.gitignore`, and `__init__.py` (which defines this directory as the main `pyborg` package).
+*   **`analysis`**: Provides tools for the quantitative analysis of generated data. It includes modules for spike train analysis, processing of simulated calcium signals (ΔF/F), and inferring functional connectivity from observed activity.
+*   **`core`**: Defines the fundamental mathematical models of neurons and synapses, utilizing Brian2's syntax. It serves as the base library of neural components for building networks within organoids, ensuring accuracy and efficiency in simulations.
+*   **`docs`**: Stores the project's documentation. It is intended to include user guides, tutorials, auto-generated API documentation, and other relevant information for both developers and users of the library.
+*   **`electrophysiology`**: Dedicated to the simulation of electrophysiological protocols. It includes the generation of stimulus patterns, configuration of monitors for recording various data (spikes, Vm, calcium), and persistence of results in SQLite databases.
+*   **`examples`**: Contains a collection of Jupyter Notebooks demonstrating how to use `pyborg`. The examples progress from basic setups to more complex simulations, serving as a practical guide for users.
+*   **`mea`**: Models the Microelectrode Array (MEA), including the geometry and positioning of electrodes. It allows the interface for simulating targeted electrical stimulation and reading activity signals near the electrodes.
+*   **`network_plasticity`**: Contains the rules and mechanisms for simulating neural network plasticity. It implements models of synaptic plasticity (like STDP) and structural plasticity, allowing connections to evolve dynamically in response to activity.
+*   **`organoid`**: Manages the creation and representation of the organoid. It defines neuronal populations, their properties, three-dimensional spatial arrangement, and initial structural connectivity, establishing the physical substrate of the simulation.
+*   **`simulation`**: Acts as the central orchestrator of the simulations. It integrates components of the organoid, MEA, plasticity rules, and electrophysiology protocols, managing the temporal execution of the simulation in Brian2.
+*   **`tests`**: Dedicated to automated code testing to ensure its correctness and robustness. It includes unit tests for individual components and integration tests to verify the interaction between different modules of the system.
+*   **`utils`**: Houses general-purpose utility modules and functions that support other parts of the project. This may include configuration file parsers, auxiliary mathematical functions, or other generic tools.
+*   **`visualization`**: Responsible for the graphical representation of simulation and analysis results. It contains functions for generating raster plots, graphs of membrane potential or calcium traces, activity maps, and connectivity graph visualizations.
+
 ```
 pyborg/ 
 ├── .gitignore
@@ -332,8 +348,8 @@ pyborg/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your_username/pyBOrg.git
-cd pyBOrg
+git clone https://github.com/bioquaintum/pyborg/pyborg.git
+cd pyborg
 
 # Create a virtual environment (recommended)
 python -m venv venv
@@ -342,7 +358,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Install pyBOrg in editable mode (for development)
+# Install pyborg in editable mode (for development)
 pip install -e .
 ```
 
