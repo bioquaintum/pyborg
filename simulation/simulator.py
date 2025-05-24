@@ -1,20 +1,20 @@
-# pyborg/simulation/simulator.py
+# pybrainorg/simulation/simulator.py
 
 """
-Defines the Simulator class for orchestrating pyborg simulations.
+Defines the Simulator class for orchestrating pybrainorg simulations.
 
 The Simulator class takes an Organoid instance, allows adding monitors,
 constructs a Brian2 Network, and runs the simulation.
 """
 
 import brian2 as b2
-# Importar módulos pyborg
+# Importar módulos pybrainorg
 from ..organoid.organoid import Organoid # Para type hinting
 from ..electrophysiology import brian_monitors as pbg_monitors
 
 class Simulator:
     """
-    Orchestrates Brian2 simulations for a given pyborg Organoid.
+    Orchestrates Brian2 simulations for a given pybrainorg Organoid.
 
     This class manages the collection of Brian2 objects from an Organoid,
     allows for the addition of monitors, builds a Brian2 Network,
@@ -22,15 +22,15 @@ class Simulator:
 
     Parameters
     ----------
-    organoid : pyborg.organoid.organoid.Organoid
-        The pyborg Organoid instance to be simulated.
+    organoid : pybrainorg.organoid.organoid.Organoid
+        The pybrainorg Organoid instance to be simulated.
     brian2_dt : brian2.units.fundamentalunits.Quantity, optional
         The default clock dt for the simulation. If None, Brian2's default
         (0.1*ms) will be used or inherited. (default: None).
 
     Attributes
     ----------
-    organoid : pyborg.organoid.organoid.Organoid
+    organoid : pybrainorg.organoid.organoid.Organoid
         The associated Organoid object.
     brian_network : brian2.Network or None
         The constructed Brian2 Network object. Initially None.
@@ -45,7 +45,7 @@ class Simulator:
         Initializes a new Simulator instance.
         """
         if not isinstance(organoid, Organoid):
-            raise TypeError("organoid must be an instance of pyborg.organoid.Organoid.")
+            raise TypeError("organoid must be an instance of pybrainorg.organoid.Organoid.")
 
         self.organoid = organoid
         self.brian_network = None
@@ -75,7 +75,7 @@ class Simulator:
             The name of the NeuronGroup within the organoid to monitor.
         **kwargs :
             Additional keyword arguments to pass to the specific monitor setup function
-            from `pyborg.electrophysiology.brian_monitors`.
+            from `pybrainorg.electrophysiology.brian_monitors`.
             For "state" monitor, `variables` (str or list) is required.
             For "spike" or "state", `record` (bool or list/slice) can be provided.
 
@@ -195,7 +195,7 @@ class Simulator:
                            f"Available monitors: {list(self.monitors.keys())}")
         return self.monitors[monitor_name]
 
-    def store_simulation(self, filename="pyborg_sim_state"):
+    def store_simulation(self, filename="pybrainorg_sim_state"):
         """
         Stores the current state of the simulation network.
 
@@ -203,7 +203,7 @@ class Simulator:
         ----------
         filename : str, optional
             The filename (without extension) to store the state.
-            (default: "pyborg_sim_state").
+            (default: "pybrainorg_sim_state").
         """
         if self.brian_network is None:
             print("Warning: Network not built yet. Nothing to store.")
@@ -212,7 +212,7 @@ class Simulator:
         print(f"Simulation state stored in '{filename}.bri'")
 
 
-    def restore_simulation(self, filename="pyborg_sim_state"):
+    def restore_simulation(self, filename="pybrainorg_sim_state"):
         """
         Restores the state of the simulation network from a file.
 
@@ -225,7 +225,7 @@ class Simulator:
         ----------
         filename : str, optional
             The filename (without extension) to restore the state from.
-            (default: "pyborg_sim_state").
+            (default: "pybrainorg_sim_state").
         """
         if self.brian_network is None:
             # It's possible to restore even if network isn't explicitly built here,
