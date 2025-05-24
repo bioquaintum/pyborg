@@ -1,4 +1,4 @@
-[logo](logo.png)
+![logo](logo.png)
 
 # pybrainorg: Python Brain Organoid Simulator
 
