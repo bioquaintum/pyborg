@@ -1,8 +1,8 @@
-# pyborg/organoid/spatial.py
+# pybrainorg/organoid/spatial.py
 
 """
 Functions for generating and manipulating spatial coordinates of neurons
-within a pyborg organoid.
+within a pybrainorg organoid.
 
 These functions typically return NumPy arrays of coordinates, which can then
 be assigned to `brian2.NeuronGroup` objects. Brian2 units are used where
