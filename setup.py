@@ -8,11 +8,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 # --- Get the version (a common way is from a __version__.py file) ---
-# For now, let's define it directly, but consider moving it to pyborg/__init__.py
-# or pyborg/version.py and reading it from there.
-# Example if it were in pyborg/__init__.py:
+# For now, let's define it directly, but consider moving it to pybrainorg/__init__.py
+# or pybrainorg/version.py and reading it from there.
+# Example if it were in pybrainorg/__init__.py:
 # version_info = {}
-# with open(os.path.join("pyborg", "__init__.py")) as fp: # Adjust 'pyborg' if your package name differs
+# with open(os.path.join("pybrainorg", "__init__.py")) as fp: # Adjust 'pybrainorg' if your package name differs
 #     exec(fp.read(), version_info)
 # current_version = version_info['__version__']
 current_version = "0.1.0" # Initial development version
@@ -52,24 +52,24 @@ extras_require["all"] = sum(extras_require.values(), [])
 
 
 setuptools.setup(
-    name="pyborg",  # Package name as it will appear on PyPI
+    name="pybrainorg",  # Package name as it will appear on PyPI
     version=current_version,
     author="Luciano Silva / Bioquaintum Research & Development", # Replace
     author_email="luciano.silva@bioquaintum.io", # Replace
     description="A Python Brain Organoid Simulator using Brian2.",
     long_description=long_description,
     long_description_content_type="text/markdown", # Content type of the README
-    url="https://github.com/bioquaintum/pyborg",  # URL of your GitHub repository (Replace)
+    url="https://github.com/bioquaintum/pybrainorg",  # URL of your GitHub repository (Replace)
     project_urls={ # Additional useful URLs
-        "Bug Tracker": "https://github.com/bioquaintum/pyborg/issues",
-        "Documentation": "https://pyborg.readthedocs.io/", # If you host on ReadTheDocs
-        "Source Code": "https://github.com/your_username/pyborg",
+        "Bug Tracker": "https://github.com/bioquaintum/pybrainorg/issues",
+        "Documentation": "https://pybrainorg.readthedocs.io/", # If you host on ReadTheDocs
+        "Source Code": "https://github.com/your_username/pybrainorg",
     },
     packages=setuptools.find_packages(
         where='.', # Look for packages from the current directory
         exclude=['tests*', 'examples*'] # Exclude tests and examples directories
     ),
-    # If your code was in a 'src/pyborg' directory:
+    # If your code was in a 'src/pybrainorg' directory:
     # package_dir={'': 'src'},
     # packages=setuptools.find_packages(where='src', exclude=("tests*", "examples*")),
 
@@ -94,12 +94,12 @@ setuptools.setup(
     # If you have non-code package data that needs to be included:
     # include_package_data=True,
     # package_data={
-    #     'pyborg': ['data_files/*.json'], # Example
+    #     'pybrainorg': ['data_files/*.json'], # Example
     # },
     # If you have command-line executable scripts:
     # entry_points={
     #     'console_scripts': [
-    #         'pyborg_cli=pyborg.cli:main_function', # Example
+    #         'pybrainorg_cli=pybrainorg.cli:main_function', # Example
     #     ],
     # },
     keywords="brain organoid simulation brian2 neuroscience computational-neuroscience",
