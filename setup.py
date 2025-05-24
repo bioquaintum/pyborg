@@ -3,50 +3,46 @@
 import setuptools
 import os
 
-# --- Obter a descrição longa do arquivo README ---
+# --- Get the long description from the README file ---
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-# --- Obter a versão (uma forma comum é de um arquivo __version__.py) ---
-# Por agora, vamos definir diretamente, mas considere mover para pyborg/__init__.py
-# ou pyborg/version.py e ler daqui.
-# Exemplo se estivesse em pyborg/__init__.py:
-# version = {}
-# with open(os.path.join("pyborg", "__init__.py")) as fp:
-#     exec(fp.read(), version)
-# current_version = version['__version__']
-current_version = "0.1.0" # Versão inicial de desenvolvimento
+# --- Get the version (a common way is from a __version__.py file) ---
+# For now, let's define it directly, but consider moving it to pyborg/__init__.py
+# or pyborg/version.py and reading it from there.
+# Example if it were in pyborg/__init__.py:
+# version_info = {}
+# with open(os.path.join("pyborg", "__init__.py")) as fp: # Adjust 'pyborg' if your package name differs
+#     exec(fp.read(), version_info)
+# current_version = version_info['__version__']
+current_version = "0.1.0" # Initial development version
 
-# --- Listar as dependências ---
-# É bom especificar versões mínimas se você souber de incompatibilidades.
-# Você pode ler de um requirements.txt ou listá-las aqui.
-# Se você tem um requirements.txt para desenvolvimento, pode mantê-lo separado
-# ou sincronizado com esta lista.
+# --- List the dependencies ---
+# It's good to specify minimum versions if you know of incompatibilities.
+# You can read from a requirements.txt or list them here.
 install_requires = [
-    "brian2>=2.5",      # Núcleo da simulação
-    "numpy>=1.20",      # Manipulação de arrays numéricos
-    "matplotlib>=3.4",  # Para plots e visualizações
-    "scipy>=1.7",       # Funções científicas (muitas vezes dependência do Brian2)
-    "networkx>=2.6",    # Para análise e visualização de grafos (em analysis/visualization)
-    # Adicione outras dependências de TEMPO DE EXECUÇÃO aqui
-    # Dependências de desenvolvimento (testes, linting, build de docs)
-    # são geralmente gerenciadas separadamente (e.g., em requirements-dev.txt ou extras_require)
+    "brian2>=2.5",      # Core simulation engine
+    "numpy>=1.20",      # Numerical array manipulation
+    "matplotlib>=3.4",  # For plots and visualizations
+    "scipy>=1.7",       # Scientific functions (often a Brian2 dependency)
+    "networkx>=2.6",    # For graph analysis and visualization (in analysis/visualization)
+    # Add other RUNTIME dependencies here
 ]
 
-# --- Dependências opcionais (para desenvolvimento, testes, documentação) ---
+# --- Optional dependencies (for development, testing, documentation) ---
 extras_require = {
     "dev": [
         "pytest>=6.0",
         "flake8>=3.9",
         "black>=21.0b0",
-        "ipykernel", # Para rodar notebooks de exemplo
+        "ipykernel", # For running example notebooks
         "jupyterlab",
     ],
     "docs": [
         "sphinx>=4.0",
         "sphinx-rtd-theme>=1.0",
         "nbsphinx>=0.8",
-        "ipykernel", # nbsphinx precisa para executar notebooks
+        "ipykernel", # nbsphinx needs this to execute notebooks
     ],
     "test": [
         "pytest>=6.0",
@@ -56,35 +52,33 @@ extras_require["all"] = sum(extras_require.values(), [])
 
 
 setuptools.setup(
-    name="pyborg",  # Nome do pacote como aparecerá no PyPI
+    name="pyborg",  # Package name as it will appear on PyPI
     version=current_version,
-    author="Seu Nome / Nome da Equipe", # Substitua
-    author_email="seu.email@example.com", # Substitua
+    author="Luciano Silva / Bioquaintum Research & Development", # Replace
+    author_email="luciano.silva@bioquaintum.io", # Replace
     description="A Python Brain Organoid Simulator using Brian2.",
     long_description=long_description,
-    long_description_content_type="text/markdown", # Tipo de conteúdo do README
-    url="https://github.com/seu_usuario/pyborg",  # URL do seu repositório GitHub (Substitua)
-    project_urls={ # URLs adicionais úteis
-        "Bug Tracker": "https://github.com/seu_usuario/pyborg/issues",
-        "Documentation": "https://pyborg.readthedocs.io/", # Se você hospedar no ReadTheDocs
-        "Source Code": "https://github.com/seu_usuario/pyborg",
+    long_description_content_type="text/markdown", # Content type of the README
+    url="https://github.com/bioquaintum/pyborg",  # URL of your GitHub repository (Replace)
+    project_urls={ # Additional useful URLs
+        "Bug Tracker": "https://github.com/bioquaintum/pyborg/issues",
+        "Documentation": "https://pyborg.readthedocs.io/", # If you host on ReadTheDocs
+        "Source Code": "https://github.com/your_username/pyborg",
     },
-    # packages=setuptools.find_packages(exclude=("tests*", "examples*")),
-    # Se a raiz do seu repositório é o pacote 'pyborg' (contém __init__.py e os submódulos):
     packages=setuptools.find_packages(
-        where='.', # Busca pacotes a partir do diretório atual
-        exclude=['tests*', 'examples*'] # Exclui os diretórios de testes e exemplos
+        where='.', # Look for packages from the current directory
+        exclude=['tests*', 'examples*'] # Exclude tests and examples directories
     ),
-    # Se o seu código estivesse em um diretório 'src/pyborg':
+    # If your code was in a 'src/pyborg' directory:
     # package_dir={'': 'src'},
     # packages=setuptools.find_packages(where='src', exclude=("tests*", "examples*")),
 
-    classifiers=[ # Classificadores ajudam usuários a encontrar seu projeto
-        "Development Status :: 3 - Alpha",  # Estágio de desenvolvimento
+    classifiers=[ # Classifiers help users find your project
+        "Development Status :: 3 - Alpha",  # Development stage
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
-        "License :: OSI Approved :: MIT License",  # Substitua pela sua licença
+        "License :: OSI Approved :: MIT License",  # Replace with your chosen license
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
@@ -92,20 +86,20 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Natural Language :: English", # Ou Português, se a interface principal for
+        "Natural Language :: English",
     ],
-    python_requires='>=3.7',  # Versão mínima do Python suportada
+    python_requires='>=3.7',  # Minimum supported Python version
     install_requires=install_requires,
     extras_require=extras_require,
-    # Se você tiver dados de pacote não-código que precisam ser incluídos:
+    # If you have non-code package data that needs to be included:
     # include_package_data=True,
     # package_data={
-    #     'pyborg': ['data_files/*.json'], # Exemplo
+    #     'pyborg': ['data_files/*.json'], # Example
     # },
-    # Se você tiver scripts executáveis de linha de comando:
+    # If you have command-line executable scripts:
     # entry_points={
     #     'console_scripts': [
-    #         'pyborg_cli=pyborg.cli:main_function', # Exemplo
+    #         'pyborg_cli=pyborg.cli:main_function', # Example
     #     ],
     # },
     keywords="brain organoid simulation brian2 neuroscience computational-neuroscience",
