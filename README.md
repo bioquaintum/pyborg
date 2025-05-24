@@ -1,11 +1,11 @@
 
-# pyborg: Python Brain Organoid Simulator
+# pybrainorg: Python Brain Organoid Simulator
 
-**pyborg** is a Python module designed for simulating brain organoids, leveraging the power and flexibility of the Brian2 spiking neural network simulator. It provides a structured framework to model neurons and synapses within organoids, simulate their development and activity, and interact with them using simulated Microelectrode Arrays (MEAs) and calcium imaging techniques.
+**pybrainorg** is a Python module designed for simulating brain organoids, leveraging the power and flexibility of the Brian2 spiking neural network simulator. It provides a structured framework to model neurons and synapses within organoids, simulate their development and activity, and interact with them using simulated Microelectrode Arrays (MEAs) and calcium imaging techniques.
 
 ## Objective
 
-The primary goal of `pyBOrg` is to provide researchers with an accessible, modular, and extensible in-silico platform to:
+The primary goal of `pybrainorg` is to provide researchers with an accessible, modular, and extensible in-silico platform to:
 *   Model the formation and maturation of neural networks in brain organoids.
 *   Simulate electrophysiological experiments, including MEA-based stimulation and recording.
 *   Simulate calcium imaging experiments to observe network activity with high spatial resolution.
@@ -46,11 +46,11 @@ This snippet shows how to set up a simple organoid, an MEA, and stimulate a spec
 
 ```python
 import brian2 as b2
-from pyborg.organoid import Organoid, spatial
-from pyborg.core import neuron_models
-from pyborg.mea import MEA
-from pyborg.simulation import Simulator
-from pyborg.electrophysiology import stimulus_generator
+from pybrainorg.organoid import Organoid, spatial
+from pybrainorg.core import neuron_models
+from pybrainorg.mea import MEA
+from pybrainorg.simulation import Simulator
+from pybrainorg.electrophysiology import stimulus_generator
 
 # Ensure reproducible results
 b2.seed(42)
@@ -108,7 +108,7 @@ sim.run(100*b2.ms)
 
 # 8. Retrieve and plot data (example)
 # spike_data = sim.get_data("all_spikes")
-# from pyborg.visualization import spike_plotter
+# from pybrainorg.visualization import spike_plotter
 # spike_plotter.plot_raster(spike_data.i, spike_data.t, duration=100*b2.ms)
 # b2.show()
 
@@ -121,10 +121,10 @@ This snippet demonstrates how to record spikes from an MEA region and simulated 
 
 ```python
 import brian2 as b2
-from pyborg.organoid import Organoid, spatial
-from pyborg.core import neuron_models # Assuming LIFCalciumFluorNeuron exists
-from pyborg.mea import MEA
-from pyborg.simulation import Simulator
+from pybrainorg.organoid import Organoid, spatial
+from pybrainorg.core import neuron_models # Assuming LIFCalciumFluorNeuron exists
+from pybrainorg.mea import MEA
+from pybrainorg.simulation import Simulator
 
 # Ensure reproducible results
 b2.seed(123)
@@ -178,13 +178,13 @@ sim_ca.run(200*b2.ms)
 
 # 7. Retrieve and plot data
 # spikes_mea_region = sim_ca.get_data("mea_spikes_region")
-# from pyborg.visualization import spike_plotter
+# from pybrainorg.visualization import spike_plotter
 # spike_plotter.plot_raster(spikes_mea_region.i, spikes_mea_region.t, duration=200*b2.ms)
 # b2.show()
 
 # fluorescence_data = sim_ca.get_data("fluorescence_trace")
-# from pyborg.visualization import calcium_plotter
-# from pyborg.analysis import calcium_analysis
+# from pybrainorg.visualization import calcium_plotter
+# from pybrainorg.analysis import calcium_analysis
 # F_traces = fluorescence_data.F
 # t_traces = fluorescence_data.t
 # delta_F_over_F = calcium_analysis.calculate_deltaF_over_F(F_traces, t_traces)
@@ -200,14 +200,14 @@ sim_ca.close()
 
 ## Project Directory Structure
 
-The `pyborg` structure is designed to be modular and intuitive, organizing the code into directories that represent the main functionalities of a brain organoid simulator. Each directory encapsulates a specific area, from defining basic neural components and constructing the organoid, through simulating experimental interactions and plasticity, to analyzing and visualizing the generated data, with additional support from examples, tests, and documentation.
+The `pybrainorg` structure is designed to be modular and intuitive, organizing the code into directories that represent the main functionalities of a brain organoid simulator. Each directory encapsulates a specific area, from defining basic neural components and constructing the organoid, through simulating experimental interactions and plasticity, to analyzing and visualizing the generated data, with additional support from examples, tests, and documentation.
 
-*   **Root Files**: Located at the root of the project (the `pyborg` directory which is the main package), these include essential files such as `README.md` (project overview), `setup.py` (for package installation), `requirements.txt` (dependencies), `LICENSE`, `.gitignore`, and `__init__.py` (which defines this directory as the main `pyborg` package).
+*   **Root Files**: Located at the root of the project (the `pybrainorg` directory which is the main package), these include essential files such as `README.md` (project overview), `setup.py` (for package installation), `requirements.txt` (dependencies), `LICENSE`, `.gitignore`, and `__init__.py` (which defines this directory as the main `pybrainorg` package).
 *   **`analysis`**: Provides tools for the quantitative analysis of generated data. It includes modules for spike train analysis, processing of simulated calcium signals (ΔF/F), and inferring functional connectivity from observed activity.
 *   **`core`**: Defines the fundamental mathematical models of neurons and synapses, utilizing Brian2's syntax. It serves as the base library of neural components for building networks within organoids, ensuring accuracy and efficiency in simulations.
 *   **`docs`**: Stores the project's documentation. It is intended to include user guides, tutorials, auto-generated API documentation, and other relevant information for both developers and users of the library.
 *   **`electrophysiology`**: Dedicated to the simulation of electrophysiological protocols. It includes the generation of stimulus patterns, configuration of monitors for recording various data (spikes, Vm, calcium), and persistence of results in SQLite databases.
-*   **`examples`**: Contains a collection of Jupyter Notebooks demonstrating how to use `pyborg`. The examples progress from basic setups to more complex simulations, serving as a practical guide for users.
+*   **`examples`**: Contains a collection of Jupyter Notebooks demonstrating how to use `pybrainorg`. The examples progress from basic setups to more complex simulations, serving as a practical guide for users.
 *   **`mea`**: Models the Microelectrode Array (MEA), including the geometry and positioning of electrodes. It allows the interface for simulating targeted electrical stimulation and reading activity signals near the electrodes.
 *   **`plasticity`**: Contains the rules and mechanisms for simulating neural network plasticity. It implements models of synaptic plasticity (like STDP) and structural plasticity, allowing connections to evolve dynamically in response to activity.
 *   **`organoid`**: Manages the creation and representation of the organoid. It defines neuronal populations, their properties, three-dimensional spatial arrangement, and initial structural connectivity, establishing the physical substrate of the simulation.
@@ -217,7 +217,7 @@ The `pyborg` structure is designed to be modular and intuitive, organizing the c
 *   **`visualization`**: Responsible for the graphical representation of simulation and analysis results. It contains functions for generating raster plots, graphs of membrane potential or calcium traces, activity maps, and connectivity graph visualizations.
 
 ```
-pyborg/ 
+pybrainorg/ 
 ├── .gitignore
 ├── LICENSE
 ├── README.md
@@ -348,8 +348,8 @@ pyborg/
 
 ```bash
 # Clone the repository
-git clone https://github.com/bioquaintum/pyborg/pyborg.git
-cd pyborg
+git clone https://github.com/bioquaintum/pybrainorg/pybrainorg.git
+cd pybrainorg
 
 # Create a virtual environment (recommended)
 python -m venv venv
@@ -358,7 +358,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Install pyborg in editable mode (for development)
+# Install pybrainorg in editable mode (for development)
 pip install -e .
 ```
 
