@@ -1,4 +1,4 @@
-**pyborg Implementation Roadmap**
+**pybrainorg Implementation Roadmap**
 
 **Phase 1: Core Essentials and Basic Simulation (MVP - Minimum Viable Product)**
 
