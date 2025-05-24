@@ -1,7 +1,7 @@
-# pyborg/core/synapse_models.py
+# pybrainorg/core/synapse_models.py
 
 """
-Collection of predefined synapse models for use with Brian2 in pyborg simulations.
+Collection of predefined synapse models for use with Brian2 in pybrainorg simulations.
 
 Each function in this module returns a dictionary containing the necessary
 components (model equations, on_pre/on_post actions, namespace) to define
