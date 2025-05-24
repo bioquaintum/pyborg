@@ -209,7 +209,7 @@ The `pyborg` structure is designed to be modular and intuitive, organizing the c
 *   **`electrophysiology`**: Dedicated to the simulation of electrophysiological protocols. It includes the generation of stimulus patterns, configuration of monitors for recording various data (spikes, Vm, calcium), and persistence of results in SQLite databases.
 *   **`examples`**: Contains a collection of Jupyter Notebooks demonstrating how to use `pyborg`. The examples progress from basic setups to more complex simulations, serving as a practical guide for users.
 *   **`mea`**: Models the Microelectrode Array (MEA), including the geometry and positioning of electrodes. It allows the interface for simulating targeted electrical stimulation and reading activity signals near the electrodes.
-*   **`network_plasticity`**: Contains the rules and mechanisms for simulating neural network plasticity. It implements models of synaptic plasticity (like STDP) and structural plasticity, allowing connections to evolve dynamically in response to activity.
+*   **`plasticity`**: Contains the rules and mechanisms for simulating neural network plasticity. It implements models of synaptic plasticity (like STDP) and structural plasticity, allowing connections to evolve dynamically in response to activity.
 *   **`organoid`**: Manages the creation and representation of the organoid. It defines neuronal populations, their properties, three-dimensional spatial arrangement, and initial structural connectivity, establishing the physical substrate of the simulation.
 *   **`simulation`**: Acts as the central orchestrator of the simulations. It integrates components of the organoid, MEA, plasticity rules, and electrophysiology protocols, managing the temporal execution of the simulation in Brian2.
 *   **`tests`**: Dedicated to automated code testing to ensure its correctness and robustness. It includes unit tests for individual components and integration tests to verify the interaction between different modules of the system.
@@ -285,7 +285,7 @@ pyborg/
 │   ├── __init__.py
 │   └── mea.py
 │
-├── network_plasticity/
+├── plasticity/
 │   ├── __init__.py
 │   ├── base_plasticity_rule.py
 │   ├── growth_guidance.py
