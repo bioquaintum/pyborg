@@ -1,8 +1,8 @@
-# pyborg/visualization/spike_plotter.py
+# pybrainorg/visualization/spike_plotter.py
 
 """
 Functions for visualizing spike train data and membrane potential traces
-from pyborg simulations, using Matplotlib.
+from pybrainorg simulations, using Matplotlib.
 """
 
 import matplotlib.pyplot as plt
@@ -48,7 +48,7 @@ def plot_raster(spike_indices, spike_times, duration=None, ax=None,
     Examples
     --------
     >>> from brian2 import SpikeMonitor, NeuronGroup, run, ms, Network
-    >>> from pyborg.visualization.spike_plotter import plot_raster
+    >>> from pybrainorg.visualization.spike_plotter import plot_raster
     >>> G = NeuronGroup(5, 'dv/dt=-v/(10*ms) : 1', threshold='v>1', reset='v=0', method='exact')
     >>> G.v = [1.1, 0.5, 1.2, 0.1, 1.3] # Make some spike
     >>> spikemon = SpikeMonitor(G)
