@@ -243,12 +243,10 @@ pybrainorg/
 │
 ├── docs/
 │   ├── api/
-│   │   └── (arquivos .rst para documentação da API)
 │   ├── conf.py
 │   ├── index.rst
 │   ├── installation.rst
 │   └── tutorials/
-│       └── (arquivos .rst ou links para notebooks)
 │
 ├── electrophysiology/
 │   ├── __init__.py
@@ -279,7 +277,6 @@ pybrainorg/
 │   ├── 15_Example_Modeling_a_Simplified_Disease_Phenotype.ipynb
 │   ├── README.md
 │   └── data/
-│       └── (vazio ou example_config.json)
 │
 ├── mea/
 │   ├── __init__.py
