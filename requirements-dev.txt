@@ -1,0 +1,31 @@
+# requirements-dev.txt
+
+# --- Core runtime dependencies ---
+brian2>=2.5
+numpy>=1.20
+matplotlib>=3.4
+scipy>=1.7
+networkx>=2.6
+
+# --- Dependencies for examples (Jupyter notebooks) ---
+# (Incluído em 'dev' e 'docs' abaixo, mas pode ser explícito se desejado)
+# jupyterlab>=3.0
+# ipykernel>=6.0
+
+# --- Development dependencies ---
+pytest>=6.0         # For running tests
+flake8>=3.9         # For linting
+black>=21.0b0       # For code formatting
+ipykernel           # For running notebooks during development
+jupyterlab          # For interactive development with notebooks
+
+# --- Documentation dependencies ---
+sphinx>=4.0
+sphinx-rtd-theme>=1.0
+nbsphinx>=0.8
+# ipykernel is also needed by nbsphinx to execute notebooks during doc build
+
+# --- Test specific dependencies (se houver algo além do pytest) ---
+# (pytest já está em dev)
+
+# Se você tiver outros grupos em extras_require, liste-os também.

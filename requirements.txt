@@ -1,0 +1,17 @@
+# requirements.txt
+# This file lists the dependencies for running pybrainorg and its examples.
+# For a full development environment including testing and documentation tools,
+# you can install extras: pip install .[dev,docs,test]
+
+# --- Core runtime dependencies ---
+# These are also specified in setup.py's install_requires
+brian2>=2.5
+numpy>=1.20
+matplotlib>=3.4
+scipy>=1.7
+networkx>=2.6
+
+# --- Dependencies for running examples (Jupyter notebooks) ---
+# These would typically be part of a 'dev' or 'examples' extra in setup.py
+jupyterlab>=3.0   # Or 'notebook' if you prefer the classic interface
+ipykernel>=6.0    # Needed by Jupyter to run Python kernels
