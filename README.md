@@ -90,7 +90,7 @@ If you have cloned the `pyneurorg` repository or have the source code:
 The `pyneurorg` project is organized with a clear separation between the installable package code, documentation, examples, and tests. The main package code resides within the `src/` directory.
 
 ```
-pyneurorg_project_root/
+pyneurorg/
 ├── docs/
 ├── examples/
 │   ├── 00_Installation_and_Setup.ipynb
