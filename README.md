@@ -39,6 +39,51 @@ The primary goal of `pyneurorg` is to provide researchers with an accessible, mo
 *   **Modularity and Extensibility:** Designed to easily add new neuron models, synapse types, plasticity rules, or analysis techniques.
 *   **Jupyter Notebook Examples:** A comprehensive suite of examples from basic setup to advanced simulations.
 
+## Project Directory Structure
+
+The `pyneurorg` project is organized with a clear separation between the installable package code, documentation, examples, and tests. The main package code resides within the `src/` directory.
+
+```
+pyneurorg_project_root/
+├── docs/
+├── examples/
+│   ├── 00_Installation_and_Setup.ipynb
+│   ├── 01_Creating_Your_First_Organoid.ipynb
+│   ├── 02_Running_a_Simple_Simulation_and_Recording_Spikes.ipynb
+│   ├── 03_Exploring_Neuron_and_Synapse_Models.ipynb
+│   ├── 04_Spatial_Arrangement_and_Connectivity_Rules.ipynb
+│   ├── 05_MEA_Stimulation_and_Basic_Recording.ipynb
+│   ├── 06_Simulating_Spontaneous_Activity_and_LFP_Proxy.ipynb
+│   ├── 07_Patterned_Stimulation_and_Response_Analysis.ipynb
+│   ├── 08_Implementing_Synaptic_Plasticity_STDP.ipynb
+│   ├── 09_Simulating_Structural_Plasticity_Network_Formation.ipynb
+│   ├── 10_Modeling_Calcium_Dynamics_and_Fluorescence_Imaging.ipynb
+│   ├── 11_Data_Persistence_Saving_and_Loading_with_SQLite.ipynb
+│   ├── 12_Inferring_Functional_Networks_from_Spike_Data.ipynb
+│   ├── 13_Inferring_Functional_Networks_from_Calcium_Data.ipynb
+│   ├── 14_Advanced_Analysis_Bursting_and_Synchrony.ipynb
+│   └── 15_Example_Modeling_a_Simplified_Disease_Phenotype.ipynb
+├── src/
+│   └── pyneurorg/
+│       ├── analysis/
+│       ├── core/
+│       ├── electrophysiology/
+│       ├── mea/
+│       ├── organoid/
+│       ├── plasticity/
+│       ├── simulation/
+│       ├── utils/
+│       └── visualization/
+└── tests/
+```
+
+### Description of Top-Level Directories
+*   **`docs/`**: Contains files for generating the project's official documentation (e.g., using Sphinx).
+*   **`examples/`**: A collection of Jupyter Notebooks providing practical tutorials and demonstrating `pyneurorg` usage.
+*   **`src/`**: Houses the source code of the `pyneurorg` Python package. Inside `src/`, the `pyneurorg/` subdirectory is the main package.
+*   **`tests/`**: Contains automated tests (unit, integration) for the `pyneurorg` codebase.
+
+
 ## Quick Start Examples
 
 The following examples demonstrate basic functionalities of `pyneurorg`. Ensure `pyneurorg` is installed before running them.
@@ -320,53 +365,8 @@ else:
 # if hasattr(sim_activity, 'close'): sim_activity.close()
 ```
 
-## Project Directory Structure
 
-The `pyneurorg` project is organized with a clear separation between the installable package code, documentation, examples, and tests. The main package code resides within the `src/` directory.
-
-```
-pyneurorg_project_root/
-├── docs/
-├── examples/
-│   ├── 00_Installation_and_Setup.ipynb
-│   ├── 01_Creating_Your_First_Organoid.ipynb
-│   ├── 02_Running_a_Simple_Simulation_and_Recording_Spikes.ipynb
-│   ├── 03_Exploring_Neuron_and_Synapse_Models.ipynb
-│   ├── 04_Spatial_Arrangement_and_Connectivity_Rules.ipynb
-│   ├── 05_MEA_Stimulation_and_Basic_Recording.ipynb
-│   ├── 06_Simulating_Spontaneous_Activity_and_LFP_Proxy.ipynb
-│   ├── 07_Patterned_Stimulation_and_Response_Analysis.ipynb
-│   ├── 08_Implementing_Synaptic_Plasticity_STDP.ipynb
-│   ├── 09_Simulating_Structural_Plasticity_Network_Formation.ipynb
-│   ├── 10_Modeling_Calcium_Dynamics_and_Fluorescence_Imaging.ipynb
-│   ├── 11_Data_Persistence_Saving_and_Loading_with_SQLite.ipynb
-│   ├── 12_Inferring_Functional_Networks_from_Spike_Data.ipynb
-│   ├── 13_Inferring_Functional_Networks_from_Calcium_Data.ipynb
-│   ├── 14_Advanced_Analysis_Bursting_and_Synchrony.ipynb
-│   ├── 15_Example_Modeling_a_Simplified_Disease_Phenotype.ipynb
-│   ├── README.md
-│   └── data/
-├── src/
-│   └── pyneurorg/
-│       ├── analysis/
-│       ├── core/
-│       ├── electrophysiology/
-│       ├── mea/
-│       ├── organoid/
-│       ├── plasticity/
-│       ├── simulation/
-│       ├── utils/
-│       └── visualization/
-└── tests/
-```
-
-### Description of Top-Level Directories
-*   **`docs/`**: Contains files for generating the project's official documentation (e.g., using Sphinx).
-*   **`examples/`**: A collection of Jupyter Notebooks providing practical tutorials and demonstrating `pyneurorg` usage.
-*   **`src/`**: Houses the source code of the `pyneurorg` Python package. Inside `src/`, the `pyneurorg/` subdirectory is the main package.
-*   **`tests/`**: Contains automated tests (unit, integration) for the `pyneurorg` codebase.
-
-### Overview of Example Notebooks (`examples/`)
+## Overview of Example Notebooks (`examples/`)
 
 The `examples/` directory provides a guided tour through `pyneurorg`'s features:
 
