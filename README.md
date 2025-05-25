@@ -1,11 +1,10 @@
 
-![logo](logo.png)
 
-**pybrainorg** is a Python module designed for simulating brain organoids, leveraging the power and flexibility of the Brian2 spiking neural network simulator. It provides a structured framework to model neurons and synapses within organoids, simulate their development and activity, and interact with them using simulated Microelectrode Arrays (MEAs) and calcium imaging techniques.
+**pyneurorg** is a Python module designed for simulating brain organoids, leveraging the power and flexibility of the Brian2 spiking neural network simulator. It provides a structured framework to model neurons and synapses within organoids, simulate their development and activity, and interact with them using simulated Microelectrode Arrays (MEAs) and calcium imaging techniques.
 
 ## Objective
 
-The primary goal of `pybrainorg` is to provide researchers with an accessible, modular, and extensible in-silico platform to:
+The primary goal of `pyneurorg` is to provide researchers with an accessible, modular, and extensible in-silico platform to:
 *   Model the formation and maturation of neural networks in brain organoids.
 *   Simulate electrophysiological experiments, including MEA-based stimulation and recording.
 *   Simulate calcium imaging experiments to observe network activity with high spatial resolution.
@@ -23,7 +22,7 @@ The primary goal of `pybrainorg` is to provide researchers with an accessible, m
 *   **Calcium Imaging Simulation:**
     *   Neuron models incorporating intracellular calcium dynamics.
     *   Simulation of fluorescent calcium indicator signals (e.g., GCaMP's ΔF/F).
-*   **Network Plasticity:**
+*   **Network Plasticity:** (Module named `plasticity`)
     *   Implement common synaptic plasticity rules (e.g., STDP).
     *   Simulate structural plasticity for activity-dependent network formation and pruning.
 *   **Electrophysiology Suite:**
@@ -40,224 +39,227 @@ The primary goal of `pybrainorg` is to provide researchers with an accessible, m
 
 ## Quick Start Examples
 
-### 1. Stimulating the Organoid with an MEA
+The following examples demonstrate basic functionalities of `pyneurorg`. Ensure `pyneurorg` is installed before running them.
+
+### Stimulating the Organoid with an MEA
 
 This snippet shows how to set up a simple organoid, an MEA, and stimulate a specific region.
 
 ```python
 import brian2 as b2
-from pybrainorg.organoid import Organoid, spatial
-from pybrainorg.core import neuron_models
-from pybrainorg.mea import MEA
-from pybrainorg.simulation import Simulator
-from pybrainorg.electrophysiology import stimulus_generator
+import matplotlib.pyplot as plt
+import numpy as np # Often needed with Brian2
+
+# Assuming pyneurorg modules are importable
+from pyneurorg.organoid.organoid import Organoid
+from pyneurorg.organoid import spatial
+from pyneurorg.core import neuron_models
+from pyneurorg.mea.mea import MEA
+from pyneurorg.simulation.simulator import Simulator
+from pyneurorg.electrophysiology import stimulus_generator
+from pyneurorg.visualization import spike_plotter
 
 # Ensure reproducible results
-b2.seed(42)
+b2.seed(423)
+b2.prefs.codegen.target = 'numpy'
 
 # 1. Create an Organoid
-lif_model = neuron_models.LIFNeuron()
-my_organoid = Organoid(name="SimpleOrganoid")
-positions = spatial.random_positions_in_sphere(N=100, radius=200*b2.um)
-my_organoid.add_neurons(
-    num_neurons=100,
-    model_template=lif_model,
-    positions=positions,
-    name="lif_neurons"
+lif_model_definition = neuron_models.LIFNeuron(
+    tau_m=20*b2.ms, v_rest=-65*b2.mV, v_reset=-65*b2.mV,
+    v_thresh=-50*b2.mV, R_m=100*b2.Mohm, I_tonic=0.0*b2.nA,
+    refractory_period=2*b2.ms
 )
-# (Add synapses as needed...)
+my_organoid_stim = Organoid(name="StimulationOrganoid")
+neuron_positions_stim = spatial.random_positions_in_sphere(N=100, radius=150*b2.um)
+my_organoid_stim.add_neurons(
+    name="target_neurons", num_neurons=100, model_name="LIFNeuron",
+    model_params={
+        'tau_m': 20*b2.ms, 'v_rest': -65*b2.mV, 'v_reset': -65*b2.mV,
+        'v_thresh': -50*b2.mV, 'R_m': 100*b2.Mohm, 'I_tonic': 0.0*b2.nA,
+        'refractory_period': 2*b2.ms
+    },
+    positions=neuron_positions_stim, initial_values={'v': -65*b2.mV}
+)
 
 # 2. Create an MEA
-mea_layout = mea.generate_grid_layout(rows=8, cols=8, spacing=50*b2.um)
-my_mea = MEA(electrode_positions=mea_layout)
+electrode_coords = [(i*40*b2.um, j*40*b2.um, 0*b2.um) for i in range(4) for j in range(4)]
+my_mea_stim = MEA(electrode_positions=electrode_coords)
 
 # 3. Setup the Simulator
-sim = Simulator(organoid=my_organoid, mea=my_mea)
-sim.setup_simulation_entry(
-    organoid_config_details={"neuron_type": "LIF"},
-    mea_config_details={"layout": "8x8_grid"}
-) # For SQLite logging
+sim_stim = Simulator(organoid=my_organoid_stim, mea=my_mea_stim, brian2_dt=0.1*b2.ms)
 
 # 4. Define a stimulus
-pulse_stim = stimulus_generator.create_pulse_train(
-    amplitude=0.8*b2.nA,
-    frequency=10*b2.Hz,
-    pulse_width=2*b2.ms,
-    duration=100*b2.ms,
-    dt=sim.brian_dt # Use simulator's dt
+stimulation_duration = 150*b2.ms
+stimulus_waveform = stimulus_generator.create_pulse_train(
+    amplitude=0.9*b2.nA, frequency=8*b2.Hz,
+    pulse_width=2.5*b2.ms, duration=stimulation_duration,
+    dt=sim_stim.brian_dt
 )
 
-# 5. Add stimulus to an MEA electrode targeting nearby neurons
-# (Assuming electrode 0 is defined and has targetable neurons)
-sim.add_stimulus(
-    electrode_id=0,
-    stimulus_waveform=pulse_stim,
-    target_group_name="lif_neurons",
-    influence_radius=60*b2.um # Neurons within this radius of electrode 0
+# 5. Add stimulus to an MEA electrode
+sim_stim.add_stimulus(
+    electrode_id=0, stimulus_waveform=stimulus_waveform,
+    target_group_name="target_neurons", influence_radius=50*b2.um
 )
 
 # 6. Add a spike monitor
-sim.add_recording(
-    monitor_name="all_spikes",
-    monitor_type="spike",
-    target_brian_obj=my_organoid.get_neuron_group("lif_neurons")
+sim_stim.add_recording(
+    monitor_name="stimulation_spikes", monitor_type="spike",
+    target_group_name="target_neurons", record=True
 )
 
 # 7. Run simulation
-sim.run(100*b2.ms)
+print("Running MEA stimulation example...")
+sim_stim.run(stimulation_duration, report='text', report_period=50*b2.ms)
+print("Stimulation simulation finished.")
 
-# 8. Retrieve and plot data (example)
-# spike_data = sim.get_data("all_spikes")
-# from pybrainorg.visualization import spike_plotter
-# spike_plotter.plot_raster(spike_data.i, spike_data.t, duration=100*b2.ms)
-# b2.show()
-
-sim.close() # Closes SQLite connection if used
+# 8. Retrieve and plot data
+spike_data = sim_stim.get_data("stimulation_spikes")
+print(f"Recorded {len(spike_data.i)} spikes during stimulation.")
+if len(spike_data.i) > 0:
+    fig, ax = plt.subplots(figsize=(10,5))
+    spike_plotter.plot_raster(
+        spike_indices=spike_data.i, spike_times=spike_data.t,
+        duration=stimulation_duration, ax=ax,
+        title="Spikes from MEA Stimulation", marker_size=3
+    )
+    plt.tight_layout()
+    plt.show()
+else:
+    print("No spikes recorded. Try increasing stimulus amplitude or influence_radius.")
 ```
 
-### 2. Reading Activity: MEA Spikes and Calcium Imaging
+### Reading Activity: Spikes and Calcium Imaging (Full Example)
 
-This snippet demonstrates how to record spikes from an MEA region and simulated calcium fluorescence.
+This snippet demonstrates recording spikes and simulated calcium fluorescence from active neurons.
 
 ```python
 import brian2 as b2
-from pybrainorg.organoid import Organoid, spatial
-from pybrainorg.core import neuron_models # Assuming LIFCalciumFluorNeuron exists
-from pybrainorg.mea import MEA
-from pybrainorg.simulation import Simulator
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Ensure reproducible results
-b2.seed(123)
+from pyneurorg.organoid.organoid import Organoid
+from pyneurorg.organoid import spatial
+from pyneurorg.core import neuron_models
+from pyneurorg.simulation.simulator import Simulator
+from pyneurorg.visualization import spike_plotter, calcium_plotter
+from pyneurorg.analysis import calcium_analysis
 
-# 1. Create an Organoid with calcium-enabled neurons
-# (Assuming LIFCalciumFluorNeuron includes 'Ca' and 'F' state variables)
-calcium_lif_model = neuron_models.LIFCalciumFluorNeuron(tau_ca=50*b2.ms, tau_F=100*b2.ms)
-calcium_organoid = Organoid(name="CalciumOrganoid")
-positions_ca = spatial.random_positions_in_cube(N=50, side_length=150*b2.um)
-calcium_organoid.add_neurons(
-    num_neurons=50,
-    model_template=calcium_lif_model,
-    positions=positions_ca,
-    name="calcium_neurons"
-)
-# (Add synapses and some baseline input current for activity)
-calcium_organoid.get_neuron_group("calcium_neurons").I = 0.7 * b2.nA
+b2.seed(12346)
+np.random.seed(12346)
+b2.prefs.codegen.target = 'numpy'
 
-# 2. Create an MEA (optional for calcium, but can be used for LFP)
-# mea_layout_ca = mea.generate_grid_layout(rows=4, cols=4, spacing=70*b2.um)
-# my_mea_ca = MEA(electrode_positions=mea_layout_ca)
+calcium_model_function_params = {
+    'tau_m': 15*b2.ms, 'v_rest': -65*b2.mV, 'v_reset': -65*b2.mV, 'v_thresh': -50*b2.mV,
+    'R_m': 120*b2.Mohm, 'refractory_period': 3*b2.ms,
+    'tau_ca': 80*b2.ms, 'ca_spike_increment': 0.25,
+    'tau_f': 120*b2.ms, 'k_f': 0.6, 'I_tonic': 0.21*b2.nA
+}
+try:
+    calcium_model_def = neuron_models.LIFCalciumFluorNeuron(**calcium_model_function_params)
+    model_name_for_organoid = "LIFCalciumFluorNeuron"
+except AttributeError:
+    print("CRITICAL ERROR: 'LIFCalciumFluorNeuron' model not found.")
+    raise SystemExit("LIFCalciumFluorNeuron model is required for this example.")
 
-# 3. Setup the Simulator
-# sim_ca = Simulator(organoid=calcium_organoid, mea=my_mea_ca)
-sim_ca = Simulator(organoid=calcium_organoid) # MEA is optional here
-sim_ca.setup_simulation_entry(
-    organoid_config_details={"neuron_type": "LIFCalciumFluor"}
-)
+calcium_activity_organoid = Organoid(name="CalciumActivityOrganoid")
+num_activity_neurons = 20
+activity_positions = spatial.random_positions_in_cube(N=num_activity_neurons, side_length=80*b2.um)
+initial_v_activity = np.random.uniform(-65, -55, num_activity_neurons) * b2.mV
+initial_ca = calcium_model_def['namespace'].get('Ca_default_init', 0.0)
+initial_f = calcium_model_def['namespace'].get('F_default_init', 0.0)
 
-# 4. Add MEA-based spike recording (e.g., for a specific electrode)
-# This is a conceptual example; actual MEA recording might involve LFP proxies
-# or spike detection from neurons near an electrode.
-# For simplicity, we'll record all spikes here.
-sim_ca.add_recording(
-    monitor_name="mea_spikes_region",
-    monitor_type="spike",
-    target_brian_obj=calcium_organoid.get_neuron_group("calcium_neurons") # Or a subgroup
+active_neurons_group = calcium_activity_organoid.add_neurons(
+    name="active_ca_neurons", num_neurons=num_activity_neurons,
+    model_name=model_name_for_organoid, model_params=calcium_model_function_params,
+    positions=activity_positions,
+    initial_values={'v': initial_v_activity, 'Ca': initial_ca, 'F': initial_f}
 )
 
-# 5. Add Calcium/Fluorescence recording
-sim_ca.add_recording(
-    monitor_name="fluorescence_trace",
-    monitor_type="state", # Using StateMonitor for calcium variables
-    target_brian_obj=calcium_organoid.get_neuron_group("calcium_neurons"),
-    variables_to_record=['F', 'Ca'], # Record Fluorescence and Calcium
-    record_indices=list(range(5)) # Record first 5 neurons for example
+sim_activity = Simulator(organoid=calcium_activity_organoid, brian2_dt=0.1*b2.ms)
+sim_activity.add_recording(
+    monitor_name="activity_spikes", monitor_type="spike",
+    target_group_name="active_ca_neurons", record=True
 )
+indices_to_record_state = list(range(min(3, num_activity_neurons)))
+if indices_to_record_state:
+    sim_activity.add_recording(
+        monitor_name="activity_states", monitor_type="state",
+        target_group_name="active_ca_neurons",
+        variables_to_record=['v', 'Ca', 'F'],
+        record_indices=indices_to_record_state, dt=0.2*b2.ms
+    )
 
-# 6. Run simulation
-sim_ca.run(200*b2.ms)
+activity_simulation_duration = 600*b2.ms
+print(f"\nRunning activity and calcium imaging example for {activity_simulation_duration}...")
+sim_activity.run(activity_simulation_duration, report='text', report_period=100*b2.ms)
+print("Activity and calcium simulation finished.")
 
-# 7. Retrieve and plot data
-# spikes_mea_region = sim_ca.get_data("mea_spikes_region")
-# from pybrainorg.visualization import spike_plotter
-# spike_plotter.plot_raster(spikes_mea_region.i, spikes_mea_region.t, duration=200*b2.ms)
-# b2.show()
+spike_data_activity = sim_activity.get_data("activity_spikes")
+print(f"Activity example recorded {len(spike_data_activity.i)} spikes.")
+if len(spike_data_activity.i) > 0:
+    fig_spikes_act, ax_spikes_act = plt.subplots(figsize=(10,4))
+    spike_plotter.plot_raster(
+        spike_indices=spike_data_activity.i, spike_times=spike_data_activity.t,
+        duration=activity_simulation_duration, ax=ax_spikes_act,
+        title="Spikes from Active Calcium-Model Neurons"
+    )
+    plt.tight_layout()
+    plt.show()
 
-# fluorescence_data = sim_ca.get_data("fluorescence_trace")
-# from pybrainorg.visualization import calcium_plotter
-# from pybrainorg.analysis import calcium_analysis
-# F_traces = fluorescence_data.F
-# t_traces = fluorescence_data.t
-# delta_F_over_F = calcium_analysis.calculate_deltaF_over_F(F_traces, t_traces)
-# calcium_plotter.plot_calcium_traces(
-#     traces_dict={i: delta_F_over_F[i] for i in range(delta_F_over_F.shape[0])},
-#     timestamps=t_traces,
-#     title="Simulated ΔF/F Traces"
-# )
-# b2.show()
+if "activity_states" in sim_activity.monitors:
+    state_data_activity = sim_activity.get_data("activity_states")
+    time_pts_ms = state_data_activity.t / b2.ms
+    if hasattr(state_data_activity, 'v'):
+        fig_vm, ax_vm = plt.subplots(figsize=(12,4))
+        for i in range(state_data_activity.v.shape[0]):
+            original_idx = indices_to_record_state[i]
+            ax_vm.plot(time_pts_ms, state_data_activity.v[i,:] / b2.mV, label=f"Neuron {original_idx}")
+        ax_vm.set_xlabel("Time (ms)"); ax_vm.set_ylabel("Vm (mV)")
+        ax_vm.set_title("Membrane Potential (Vm) Traces"); ax_vm.legend(fontsize='small')
+        plt.tight_layout(); plt.show()
 
-sim_ca.close()
+    if hasattr(state_data_activity, 'Ca') and hasattr(state_data_activity, 'F'):
+        fig_ca_f, axes_ca_f = plt.subplots(2, 1, sharex=True, figsize=(12, 6))
+        for i in range(state_data_activity.F.shape[0]):
+            original_idx = indices_to_record_state[i]
+            axes_ca_f[0].plot(time_pts_ms, state_data_activity.F[i,:], label=f"Neuron {original_idx}")
+            axes_ca_f[1].plot(time_pts_ms, state_data_activity.Ca[i,:], label=f"Neuron {original_idx}")
+        axes_ca_f[0].set_ylabel("Fluorescence (F arb. units)"); axes_ca_f[0].set_title("Raw Fluorescence Traces"); axes_ca_f[0].legend(fontsize='small')
+        axes_ca_f[1].set_ylabel("Calcium (Ca arb. units)"); axes_ca_f[1].set_xlabel("Time (ms)"); axes_ca_f[1].set_title("Raw Intracellular Calcium Traces"); axes_ca_f[1].legend(fontsize='small')
+        plt.tight_layout(); plt.show()
+
+        try:
+            F_traces_np = np.array(state_data_activity.F)
+            delta_F_F_traces_list = []
+            for i_trace in range(F_traces_np.shape[0]):
+                f_single_trace = F_traces_np[i_trace,:]
+                baseline_end_idx = max(1, int(0.1 * len(f_single_trace))) 
+                f0 = np.mean(f_single_trace[:baseline_end_idx]); f0 = 1e-9 if abs(f0) < 1e-9 else f0
+                delta_F_F_traces_list.append((f_single_trace - f0) / f0)
+            delta_F_F_traces_np = np.array(delta_F_F_traces_list)
+            if delta_F_F_traces_np.size > 0 :
+                fig_dff, ax_dff = plt.subplots(figsize=(12,4))
+                for i_plot in range(delta_F_F_traces_np.shape[0]):
+                     ax_dff.plot(time_pts_ms, delta_F_F_traces_np[i_plot,:], label=f"Neuron {indices_to_record_state[i_plot]}")
+                ax_dff.set_xlabel("Time (ms)"); ax_dff.set_ylabel("ΔF/F")
+                ax_dff.set_title("Simulated ΔF/F Traces"); ax_dff.legend(fontsize='small');
+                plt.tight_layout(); plt.show()
+        except Exception as e_dff:
+            print(f"An error occurred during ΔF/F processing or plotting: {e_dff}")
+    else:
+        print("Fluorescence (F) or Calcium (Ca) variables not found in recorded states for plotting.")
+else:
+    print("State monitor 'activity_states' not found or no data to plot.")
 ```
 
 ## Project Directory Structure
 
-The `pybrainorg` structure is designed to be modular and intuitive, organizing the code into directories that represent the main functionalities of a brain organoid simulator. Each directory encapsulates a specific area, from defining basic neural components and constructing the organoid, through simulating experimental interactions and plasticity, to analyzing and visualizing the generated data, with additional support from examples, tests, and documentation.
-
-*   **Root Files**: Located at the root of the project (the `pybrainorg` directory which is the main package), these include essential files such as `README.md` (project overview), `setup.py` (for package installation), `requirements.txt` (dependencies), `LICENSE`, `.gitignore`, and `__init__.py` (which defines this directory as the main `pybrainorg` package).
-*   **`analysis`**: Provides tools for the quantitative analysis of generated data. It includes modules for spike train analysis, processing of simulated calcium signals (ΔF/F), and inferring functional connectivity from observed activity.
-*   **`core`**: Defines the fundamental mathematical models of neurons and synapses, utilizing Brian2's syntax. It serves as the base library of neural components for building networks within organoids, ensuring accuracy and efficiency in simulations.
-*   **`docs`**: Stores the project's documentation. It is intended to include user guides, tutorials, auto-generated API documentation, and other relevant information for both developers and users of the library.
-*   **`electrophysiology`**: Dedicated to the simulation of electrophysiological protocols. It includes the generation of stimulus patterns, configuration of monitors for recording various data (spikes, Vm, calcium), and persistence of results in SQLite databases.
-*   **`examples`**: Contains a collection of Jupyter Notebooks demonstrating how to use `pybrainorg`. The examples progress from basic setups to more complex simulations, serving as a practical guide for users.
-*   **`mea`**: Models the Microelectrode Array (MEA), including the geometry and positioning of electrodes. It allows the interface for simulating targeted electrical stimulation and reading activity signals near the electrodes.
-*   **`plasticity`**: Contains the rules and mechanisms for simulating neural network plasticity. It implements models of synaptic plasticity (like STDP) and structural plasticity, allowing connections to evolve dynamically in response to activity.
-*   **`organoid`**: Manages the creation and representation of the organoid. It defines neuronal populations, their properties, three-dimensional spatial arrangement, and initial structural connectivity, establishing the physical substrate of the simulation.
-*   **`simulation`**: Acts as the central orchestrator of the simulations. It integrates components of the organoid, MEA, plasticity rules, and electrophysiology protocols, managing the temporal execution of the simulation in Brian2.
-*   **`tests`**: Dedicated to automated code testing to ensure its correctness and robustness. It includes unit tests for individual components and integration tests to verify the interaction between different modules of the system.
-*   **`utils`**: Houses general-purpose utility modules and functions that support other parts of the project. This may include configuration file parsers, auxiliary mathematical functions, or other generic tools.
-*   **`visualization`**: Responsible for the graphical representation of simulation and analysis results. It contains functions for generating raster plots, graphs of membrane potential or calcium traces, activity maps, and connectivity graph visualizations.
+The `pyneurorg` project is organized with a clear separation between the installable package code, documentation, examples, and tests. The main package code resides within the `src/` directory.
 
 ```
-pybrainorg/ 
-├── .gitignore
-├── LICENSE
-├── README.md
-├── __init__.py
-├── requirements.txt
-├── setup.py
-│
-├── analysis/
-│   ├── __init__.py
-│   ├── calcium_analysis.py
-│   ├── network_inference/
-│   │   ├── __init__.py
-│   │   ├── base_inferrer.py
-│   │   ├── calcium_based_inference.py
-│   │   └── spike_based_inference.py
-│   └── spike_analysis.py
-│
-├── core/
-│   ├── __init__.py
-│   ├── network_builder.py
-│   ├── neuron_models.py
-│   └── synapse_models.py
-│
+pyneurorg_project_root/
 ├── docs/
-│   ├── api/
-│   ├── conf.py
-│   ├── index.rst
-│   ├── installation.rst
-│   └── tutorials/
-│
-├── electrophysiology/
-│   ├── __init__.py
-│   ├── brian_monitors.py
-│   ├── data_persistence/
-│   │   ├── __init__.py
-│   │   ├── db_schema.py
-│   │   ├── sqlite_reader.py
-│   │   └── sqlite_writer.py
-│   └── stimulus_generator.py
-│
 ├── examples/
 │   ├── 00_Installation_and_Setup.ipynb
 │   ├── 01_Creating_Your_First_Organoid.ipynb
@@ -277,96 +279,100 @@ pybrainorg/
 │   ├── 15_Example_Modeling_a_Simplified_Disease_Phenotype.ipynb
 │   ├── README.md
 │   └── data/
-│
-├── mea/
-│   ├── __init__.py
-│   └── mea.py
-│
-├── plasticity/
-│   ├── __init__.py
-│   ├── base_plasticity_rule.py
-│   ├── growth_guidance.py
-│   ├── homeostatic.py
-│   ├── stdp.py
-│   └── structural_plasticity.py
-│
-├── organoid/
-│   ├── __init__.py
-│   ├── organoid.py
-│   └── spatial.py
-│
-├── simulation/
-│   ├── __init__.py
-│   └── simulator.py
-│
-├── tests/
-│   ├── __init__.py
-│   ├── analysis/
-│   │   ├── __init__.py
-│   │   ├── network_inference/
-│   │   │   ├── __init__.py
-│   │   │   └── test_spike_based_inference.py
-│   │   └── test_spike_analysis.py
-│   ├── core/
-│   │   ├── __init__.py
-│   │   └── test_neuron_models.py
-│   ├── electrophysiology/
-│   │   ├── __init__.py
-│   │   ├── data_persistence/
-│   │   │   ├── __init__.py
-│   │   │   └── test_sqlite_writer.py
-│   │   └── test_stimulus_generator.py
-│   ├── mea/
-│   │   ├── __init__.py
-│   │   └── test_mea.py
-│   ├── network_plasticity/
-│   │   ├── __init__.py
-│   │   └── test_stdp.py
-│   ├── organoid/
-│   │   ├── __init__.py
-│   │   └── test_organoid.py
-│   └── simulation/
-│       ├── __init__.py
-│       └── test_simulator.py
-│
-├── utils/
-│   ├── __init__.py
-│   └── config_parser.py
-│
-└── visualization/
-    ├── __init__.py
-    ├── calcium_plotter.py
-    ├── network_plotter.py
-    └── spike_plotter.py
+├── src/
+│   └── pyneurorg/
+│       ├── analysis/
+│       ├── core/
+│       ├── electrophysiology/
+│       ├── mea/
+│       ├── organoid/
+│       ├── plasticity/
+│       ├── simulation/
+│       ├── utils/
+│       └── visualization/
+└── tests/
 ```
 
+### Description of Top-Level Directories
+*   **`docs/`**: Contains files for generating the project's official documentation (e.g., using Sphinx).
+*   **`examples/`**: A collection of Jupyter Notebooks providing practical tutorials and demonstrating `pyneurorg` usage.
+*   **`src/`**: Houses the source code of the `pyneurorg` Python package. Inside `src/`, the `pyneurorg/` subdirectory is the main package.
+*   **`tests/`**: Contains automated tests (unit, integration) for the `pyneurorg` codebase.
+
+### Overview of Example Notebooks (`examples/`)
+
+The `examples/` directory provides a guided tour through `pyneurorg`'s features:
+
+*   **`00_Installation_and_Setup.ipynb`**: Guides users through the installation process of `pyneurorg` and its dependencies, and includes a basic test to confirm a working setup.
+*   **`01_Creating_Your_First_Organoid.ipynb`**: Introduces the `Organoid` class, demonstrating how to define neuronal populations, assign spatial positions, and conceptually add synapses.
+*   **`02_Running_a_Simple_Simulation_and_Recording_Spikes.ipynb`**: Shows how to use the `Simulator` class to run a basic simulation of a created organoid and record neuronal spikes and membrane potentials.
+*   **`03_Exploring_Neuron_and_Synapse_Models.ipynb`**: Details the various predefined neuron and synapse models available in `pyneurorg.core` and how to customize their parameters.
+*   **`04_Spatial_Arrangement_and_Connectivity_Rules.ipynb`**: Focuses on creating 3D spatial layouts for neurons and defining rules for establishing synaptic connections between them (e.g., based on distance or probability).
+*   **`05_MEA_Stimulation_and_Basic_Recording.ipynb`**: Demonstrates how to model a Microelectrode Array (MEA), simulate electrical stimulation of the organoid via MEA electrodes, and record activity.
+*   **`06_Simulating_Spontaneous_Activity_and_LFP_Proxy.ipynb`**: Illustrates setting up a more complex network (e.g., with excitatory/inhibitory balance) to generate spontaneous activity and compute a proxy for Local Field Potentials (LFP).
+*   **`07_Patterned_Stimulation_and_Response_Analysis.ipynb`**: Shows how to use the `stimulus_generator` to create complex temporal patterns of stimulation and analyze the network's response (e.g., PSTH).
+*   **`08_Implementing_Synaptic_Plasticity_STDP.ipynb`**: Explains how to incorporate Spike-Timing-Dependent Plasticity (STDP) rules to modify synaptic strengths based on activity.
+*   **`09_Simulating_Structural_Plasticity_Network_Formation.ipynb`**: Covers the simulation of structural changes in the network, such as the activity-dependent formation and pruning of synapses.
+*   **`10_Modeling_Calcium_Dynamics_and_Fluorescence_Imaging.ipynb`**: Details how to use neuron models that include intracellular calcium dynamics and simulate the corresponding fluorescence signals from indicators like GCaMP.
+*   **`11_Data_Persistence_Saving_and_Loading_with_SQLite.ipynb`**: Demonstrates how to save simulation results (metadata, spikes, state variables) to an SQLite database and load them back for later analysis.
+*   **`12_Inferring_Functional_Networks_from_Spike_Data.ipynb`**: Shows how to use analysis tools to infer functional connectivity maps from recorded spike train data (e.g., using STTC or cross-correlation).
+*   **`13_Inferring_Functional_Networks_from_Calcium_Data.ipynb`**: Similar to the above, but demonstrates inferring functional networks from simulated calcium imaging data.
+*   **`14_Advanced_Analysis_Bursting_and_Synchrony.ipynb`**: Covers more advanced analysis techniques, such as detecting bursting patterns in neuronal activity and quantifying network synchrony.
+*   **`15_Example_Modeling_a_Simplified_Disease_Phenotype.ipynb`**: Provides an example of how `pyneurorg` can be used to model and investigate network alterations associated with a simplified disease phenotype.
 
 ## Installation
 
+There are two primary ways to install `pyneurorg`:
+
+### Option 1: Install from PyPI (Recommended for users)
+
+If `pyneurorg` is published on the Python Package Index (PyPI), you can install it directly using `pip`. This is the simplest method for end-users.
+
 ```bash
-# Clone the repository
-git clone https://github.com/bioquaintum/pybrainorg/pybrainorg.git
-cd pybrainorg
-
-# Create a virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install pybrainorg in editable mode (for development)
-pip install -e .
+pip install pyneurorg
 ```
+*(Note: This requires the package to be uploaded to PyPI by the developers.)*
+
+### Option 2: Install from a local directory (For developers or from source)
+
+If you have cloned the `pyneurorg` repository or have the source code:
+
+1.  **Navigate to the top-level `pyneurorg` project directory in your terminal** (this is the directory that contains the `setup.py` file and the `src/` folder).
+    ```bash
+    cd path/to/your/pyneurorg_project_root
+    ```
+
+2.  **(Recommended) Create and activate a virtual environment:**
+    ```bash
+    python -m venv venv_pyneurorg
+    source venv_pyneurorg/bin/activate  # On macOS/Linux
+    # .\venv_pyneurorg\Scripts\activate  # On Windows
+    ```
+
+3.  **Install `pyneurorg` in editable mode and its dependencies:**
+    The `-e` flag installs the package in "editable" mode. The `.` tells pip to look for `setup.py` in the current directory.
+    ```bash
+    pip install -e .
+    ```
+    This command reads `setup.py` (which should be configured for the `src/` layout) and installs dependencies listed in `setup.py` (which ideally reads them from `requirements.txt`).
+
+    For a full development setup, including tools for testing, linting, and documentation:
+    ```bash
+    pip install -r requirements-dev.txt
+    ```
+    Or, if you have defined extras in your `setup.py` (e.g., `dev`, `docs`, `test`):
+    ```bash
+    pip install -e .[dev,docs,test]
+    ```
 
 ## Usage
 
-Please refer to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions and demonstrations. Start with `00_Installation_and_Setup.ipynb`.
+Refer to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions. Start with `00_Installation_and_Setup.ipynb`.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues.
+Contributions are welcome! Please review contribution guidelines (consider `CONTRIBUTING.md`) before submitting pull requests.
 
 ## License
 
-This project is licensed under the **MIT License**. See the `LICENSE` file for details.
+This project is licensed under the MIT License.
