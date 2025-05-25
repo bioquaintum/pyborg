@@ -138,6 +138,7 @@ import brian2 as b2
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Assuming pyneurorg modules are importable
 from pyneurorg.organoid.organoid import Organoid
 from pyneurorg.organoid import spatial
 from pyneurorg.core import neuron_models
@@ -145,73 +146,116 @@ from pyneurorg.simulation.simulator import Simulator
 from pyneurorg.visualization import spike_plotter, calcium_plotter
 from pyneurorg.analysis import calcium_analysis
 
-b2.seed(12346)
+# Ensure reproducible results
+b2.seed(12346) # Different seed
 np.random.seed(12346)
 b2.prefs.codegen.target = 'numpy'
 
+# 1. Define parameters and get the calcium-enabled neuron model definition
+# These parameters should match what your LIFCalciumFluorNeuron function expects
 calcium_model_function_params = {
     'tau_m': 15*b2.ms, 'v_rest': -65*b2.mV, 'v_reset': -65*b2.mV, 'v_thresh': -50*b2.mV,
     'R_m': 120*b2.Mohm, 'refractory_period': 3*b2.ms,
-    'tau_ca': 80*b2.ms, 'ca_spike_increment': 0.25,
-    'tau_f': 120*b2.ms, 'k_f': 0.6, 'I_tonic': 0.21*b2.nA
+    'tau_ca': 80*b2.ms,          # Example calcium decay time constant
+    'ca_spike_increment': 0.25, # Example arbitrary unit increment of Ca per spike (unitless or specific based on model)
+    'tau_f': 120*b2.ms,          # Example fluorescence decay (related to indicator off-rate)
+    'k_f': 0.6,                  # Example scaling factor for fluorescence from Ca (unitless or specific)
+    'I_tonic': 0.21*b2.nA        # Tonic current to induce spontaneous spiking
 }
 try:
+    # Fetch the model definition dictionary
     calcium_model_def = neuron_models.LIFCalciumFluorNeuron(**calcium_model_function_params)
-    model_name_for_organoid = "LIFCalciumFluorNeuron"
+    model_name_for_organoid = "LIFCalciumFluorNeuron" # Use the function name string for Organoid
 except AttributeError:
-    print("CRITICAL ERROR: 'LIFCalciumFluorNeuron' model not found.")
+    print("CRITICAL ERROR: 'LIFCalciumFluorNeuron' model function not found in pyneurorg.core.neuron_models.")
+    print("This example cannot proceed without it for calcium imaging simulation.")
+    # To prevent error in a batch run of README, could raise SystemExit or use a fallback
+    # For now, let's assume it exists for a "real" example.
     raise SystemExit("LIFCalciumFluorNeuron model is required for this example.")
 
+
+# 2. Create an Organoid
 calcium_activity_organoid = Organoid(name="CalciumActivityOrganoid")
-num_activity_neurons = 20
+num_activity_neurons = 20 # Smaller number for clearer Vm/Ca plots
 activity_positions = spatial.random_positions_in_cube(N=num_activity_neurons, side_length=80*b2.um)
+
+# Initial membrane potentials varied to desynchronize initial firing
 initial_v_activity = np.random.uniform(-65, -55, num_activity_neurons) * b2.mV
+# Initial calcium and fluorescence (assuming they start at baseline, e.g., 0)
 initial_ca = calcium_model_def['namespace'].get('Ca_default_init', 0.0)
 initial_f = calcium_model_def['namespace'].get('F_default_init', 0.0)
 
 active_neurons_group = calcium_activity_organoid.add_neurons(
-    name="active_ca_neurons", num_neurons=num_activity_neurons,
-    model_name=model_name_for_organoid, model_params=calcium_model_function_params,
+    name="active_ca_neurons",
+    num_neurons=num_activity_neurons,
+    model_name=model_name_for_organoid, # Pass the string name
+    model_params=calcium_model_function_params, # Pass the parameters for the model function
     positions=activity_positions,
-    initial_values={'v': initial_v_activity, 'Ca': initial_ca, 'F': initial_f}
+    initial_values={
+        'v': initial_v_activity,
+        'Ca': initial_ca, # Assuming 'Ca' is a state variable in the model
+        'F': initial_f    # Assuming 'F' is a state variable in the model
+    }
 )
 
+# 3. Setup the Simulator
 sim_activity = Simulator(organoid=calcium_activity_organoid, brian2_dt=0.1*b2.ms)
-sim_activity.add_recording(
-    monitor_name="activity_spikes", monitor_type="spike",
-    target_group_name="active_ca_neurons", record=True
-)
-indices_to_record_state = list(range(min(3, num_activity_neurons)))
-if indices_to_record_state:
-    sim_activity.add_recording(
-        monitor_name="activity_states", monitor_type="state",
-        target_group_name="active_ca_neurons",
-        variables_to_record=['v', 'Ca', 'F'],
-        record_indices=indices_to_record_state, dt=0.2*b2.ms
-    )
+# sim_activity.setup_simulation_entry(...) # For SQLite logging
 
+# 4. Add SpikeMonitor for all neurons in the group
+sim_activity.add_recording(
+    monitor_name="activity_spikes",
+    monitor_type="spike",
+    target_group_name="active_ca_neurons",
+    record=True
+)
+
+# 5. Add StateMonitor for Vm, Ca, and F for a subset of neurons
+# Record from first few neurons, or all if num_activity_neurons is small
+indices_to_record_state = list(range(min(3, num_activity_neurons)))
+if indices_to_record_state: # Only add if there are neurons to record
+    sim_activity.add_recording(
+        monitor_name="activity_states",
+        monitor_type="state",
+        target_group_name="active_ca_neurons",
+        variables_to_record=['v', 'Ca', 'F'], # Must match variables in neuron model
+        record_indices=indices_to_record_state,
+        dt=0.2*b2.ms # Record states at a slightly lower frequency than simulation dt
+    )
+else:
+    print("No neurons selected for state recording.")
+
+
+# 6. Run simulation
 activity_simulation_duration = 600*b2.ms
 print(f"\nRunning activity and calcium imaging example for {activity_simulation_duration}...")
 sim_activity.run(activity_simulation_duration, report='text', report_period=100*b2.ms)
 print("Activity and calcium simulation finished.")
 
+# 7. Retrieve and Plot Spike Data
 spike_data_activity = sim_activity.get_data("activity_spikes")
 print(f"Activity example recorded {len(spike_data_activity.i)} spikes.")
+
 if len(spike_data_activity.i) > 0:
     fig_spikes_act, ax_spikes_act = plt.subplots(figsize=(10,4))
     spike_plotter.plot_raster(
-        spike_indices=spike_data_activity.i, spike_times=spike_data_activity.t,
-        duration=activity_simulation_duration, ax=ax_spikes_act,
+        spike_indices=spike_data_activity.i,
+        spike_times=spike_data_activity.t,
+        duration=activity_simulation_duration,
+        ax=ax_spikes_act,
         title="Spikes from Active Calcium-Model Neurons"
     )
     plt.tight_layout()
     plt.show()
 
+# 8. Retrieve, Process, and Plot Vm, Calcium, and Fluorescence Data
 if "activity_states" in sim_activity.monitors:
     state_data_activity = sim_activity.get_data("activity_states")
     time_pts_ms = state_data_activity.t / b2.ms
+
+    # Plot Vm
+    fig_vm, ax_vm = plt.subplots(figsize=(12,4))
     if hasattr(state_data_activity, 'v'):
-        fig_vm, ax_vm = plt.subplots(figsize=(12,4))
         for i in range(state_data_activity.v.shape[0]):
             original_idx = indices_to_record_state[i]
             ax_vm.plot(time_pts_ms, state_data_activity.v[i,:] / b2.mV, label=f"Neuron {original_idx}")
@@ -219,38 +263,59 @@ if "activity_states" in sim_activity.monitors:
         ax_vm.set_title("Membrane Potential (Vm) Traces"); ax_vm.legend(fontsize='small')
         plt.tight_layout(); plt.show()
 
+    # Plot raw Ca and F traces
     if hasattr(state_data_activity, 'Ca') and hasattr(state_data_activity, 'F'):
         fig_ca_f, axes_ca_f = plt.subplots(2, 1, sharex=True, figsize=(12, 6))
-        for i in range(state_data_activity.F.shape[0]):
+        for i in range(state_data_activity.F.shape[0]): # Assuming F and Ca have same shape[0]
             original_idx = indices_to_record_state[i]
             axes_ca_f[0].plot(time_pts_ms, state_data_activity.F[i,:], label=f"Neuron {original_idx}")
             axes_ca_f[1].plot(time_pts_ms, state_data_activity.Ca[i,:], label=f"Neuron {original_idx}")
-        axes_ca_f[0].set_ylabel("Fluorescence (F arb. units)"); axes_ca_f[0].set_title("Raw Fluorescence Traces"); axes_ca_f[0].legend(fontsize='small')
-        axes_ca_f[1].set_ylabel("Calcium (Ca arb. units)"); axes_ca_f[1].set_xlabel("Time (ms)"); axes_ca_f[1].set_title("Raw Intracellular Calcium Traces"); axes_ca_f[1].legend(fontsize='small')
+        axes_ca_f[0].set_ylabel("Fluorescence (F arbitrary units)")
+        axes_ca_f[0].set_title("Raw Fluorescence Traces")
+        axes_ca_f[0].legend(fontsize='small')
+        axes_ca_f[1].set_ylabel("Calcium (Ca arbitrary units)")
+        axes_ca_f[1].set_xlabel("Time (ms)")
+        axes_ca_f[1].set_title("Raw Intracellular Calcium Traces")
+        axes_ca_f[1].legend(fontsize='small')
         plt.tight_layout(); plt.show()
 
+        # Calculate and plot ΔF/F
         try:
+            # Using the placeholder ΔF/F calculation from previous response
             F_traces_np = np.array(state_data_activity.F)
             delta_F_F_traces_list = []
             for i_trace in range(F_traces_np.shape[0]):
                 f_single_trace = F_traces_np[i_trace,:]
-                baseline_end_idx = max(1, int(0.1 * len(f_single_trace))) 
-                f0 = np.mean(f_single_trace[:baseline_end_idx]); f0 = 1e-9 if abs(f0) < 1e-9 else f0
+                baseline_end_idx = max(1, int(0.1 * len(f_single_trace))) # Use first 10% as baseline F0
+                f0 = np.mean(f_single_trace[:baseline_end_idx])
+                if abs(f0) < 1e-9: f0 = 1e-9 # Avoid division by zero or very small F0
                 delta_F_F_traces_list.append((f_single_trace - f0) / f0)
             delta_F_F_traces_np = np.array(delta_F_F_traces_list)
-            if delta_F_F_traces_np.size > 0 :
+
+            if delta_F_F_traces_np.size > 0:
                 fig_dff, ax_dff = plt.subplots(figsize=(12,4))
+                traces_dict_for_plotter = {
+                    indices_to_record_state[i]: delta_F_F_traces_np[i,:] for i in range(delta_F_F_traces_np.shape[0])
+                }
+                # Assuming calcium_plotter.plot_calcium_traces can take a dict of traces
+                # If not, plot directly:
                 for i_plot in range(delta_F_F_traces_np.shape[0]):
-                     ax_dff.plot(time_pts_ms, delta_F_F_traces_np[i_plot,:], label=f"Neuron {indices_to_record_state[i_plot]}")
+                    ax_dff.plot(time_pts_ms, delta_F_F_traces_np[i_plot,:], label=f"Neuron {indices_to_record_state[i_plot]}")
+                
                 ax_dff.set_xlabel("Time (ms)"); ax_dff.set_ylabel("ΔF/F")
-                ax_dff.set_title("Simulated ΔF/F Traces"); ax_dff.legend(fontsize='small');
+                ax_dff.set_title("Simulated ΔF/F Traces"); ax_dff.legend(fontsize='small')
                 plt.tight_layout(); plt.show()
+
+        except AttributeError as e_dff_attr:
+            print(f"Note: Could not plot ΔF/F. A required analysis function might be missing: {e_dff_attr}")
         except Exception as e_dff:
             print(f"An error occurred during ΔF/F processing or plotting: {e_dff}")
     else:
-        print("Fluorescence (F) or Calcium (Ca) variables not found in recorded states for plotting.")
+        print("Fluorescence (F) or Calcium (Ca) variables not found in recorded states.")
 else:
     print("State monitor 'activity_states' not found or no data to plot.")
+
+# if hasattr(sim_activity, 'close'): sim_activity.close()
 ```
 
 ## Project Directory Structure
@@ -369,9 +434,6 @@ If you have cloned the `pyneurorg` repository or have the source code:
 
 Refer to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions. Start with `00_Installation_and_Setup.ipynb`.
 
-## Contributing
-
-Contributions are welcome! Please review contribution guidelines (consider `CONTRIBUTING.md`) before submitting pull requests.
 
 ## License
 
