@@ -82,13 +82,8 @@ If you have cloned the `pyneurorg` repository or have the source code:
     Or, if you have defined extras in your `setup.py` (e.g., `dev`, `docs`, `test`):
     ```bash
     pip install -e .[dev,docs,test]
+   
     ```
-
-## Usage
-
-Refer to the Quickstart Examples or to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions. Start with `00_Installation_and_Setup.ipynb`.
-
-
 
 ## Project Directory Structure
 
@@ -133,6 +128,11 @@ pyneurorg_project_root/
 *   **`examples/`**: A collection of Jupyter Notebooks providing practical tutorials and demonstrating `pyneurorg` usage.
 *   **`src/`**: Houses the source code of the `pyneurorg` Python package. Inside `src/`, the `pyneurorg/` subdirectory is the main package.
 *   **`tests/`**: Contains automated tests (unit, integration) for the `pyneurorg` codebase.
+
+
+## Usage
+
+Refer to the Quick Start Examples or to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions. Start with `00_Installation_and_Setup.ipynb`.
 
 
 ## Quick Start Examples
