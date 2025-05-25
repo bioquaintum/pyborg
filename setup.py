@@ -15,7 +15,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 # with open(os.path.join("pybrainorg", "__init__.py")) as fp: # Adjust 'pybrainorg' if your package name differs
 #     exec(fp.read(), version_info)
 # current_version = version_info['__version__']
-current_version = "0.1.0" # Initial development version
+current_version = "0.1.0" 
 
 # --- List the dependencies ---
 # It's good to specify minimum versions if you know of incompatibilities.
@@ -56,7 +56,7 @@ setuptools.setup(
     version=current_version,
     author="Luciano Silva / Bioquaintum Research & Development", # Replace
     author_email="luciano.silva@bioquaintum.io", # Replace
-    description="A Python Brain Organoid Simulator using Brian2.",
+    description="Python Brain Organoid Simulator",
     long_description=long_description,
     long_description_content_type="text/markdown", # Content type of the README
     url="https://github.com/bioquaintum/pybrainorg",  # URL of your GitHub repository (Replace)

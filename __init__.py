@@ -1,7 +1,7 @@
 # pybrainorg/__init__.py
 
 """
-pybrainorg: A Python Brain Organoid Simulator using Brian2.
+pybrainorg: Python Brain Organoid Simulator.
 
 This package provides tools to model, simulate, and analyze brain organoids.
 It allows users to define neuronal populations, synaptic connections, spatial
@@ -31,13 +31,12 @@ from .mea.mea import MEA
 # (Optional) Define __all__ to control what 'from pybrainorg import *' imports.
 # Using 'import *' is generally discouraged in production code for clarity.
 # If you choose to define it, it would look something like this:
-# __all__ = [
-#     "Organoid",
-#     "Simulator",
-#     "MEA",
-#     "__version__",
-#     # Add other names intended for 'import *'
-# ]
+__all__ = [
+     "Organoid",
+     "Simulator",
+     "MEA",
+     "__version__",
+]
 
 # You could also expose some core model functions or spatial functions here if desired,
 # but it's often cleaner to keep them namespaced, e.g.:

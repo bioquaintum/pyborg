@@ -1,7 +1,7 @@
 Metadata-Version: 2.4
 Name: pybrainorg
 Version: 0.1.0
-Summary: A Python Brain Organoid Simulator using Brian2.
+Summary: Python Brain Organoid Simulator
 Home-page: https://github.com/bioquaintum/pybrainorg
 Author: Luciano Silva / Bioquaintum Research & Development
 Author-email: luciano.silva@bioquaintum.io
@@ -68,9 +68,10 @@ Dynamic: requires-dist
 Dynamic: requires-python
 Dynamic: summary
 
-![logo](logo.png)
 
-# pybrainorg: Python Brain Organoid Simulator
+# pybrainorg
+
+# Python Brain Organoid Simulator
 
 **pybrainorg** is a Python module designed for simulating brain organoids, leveraging the power and flexibility of the Brian2 spiking neural network simulator. It provides a structured framework to model neurons and synapses within organoids, simulate their development and activity, and interact with them using simulated Microelectrode Arrays (MEAs) and calcium imaging techniques.
 
