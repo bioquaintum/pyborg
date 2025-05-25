@@ -39,6 +39,57 @@ The primary goal of `pyneurorg` is to provide researchers with an accessible, mo
 *   **Modularity and Extensibility:** Designed to easily add new neuron models, synapse types, plasticity rules, or analysis techniques.
 *   **Jupyter Notebook Examples:** A comprehensive suite of examples from basic setup to advanced simulations.
 
+## Installation
+
+There are two primary ways to install `pyneurorg`:
+
+### Option 1: Install from PyPI (Recommended for users)
+
+If `pyneurorg` is published on the Python Package Index (PyPI), you can install it directly using `pip`. This is the simplest method for end-users.
+
+```bash
+pip install pyneurorg
+```
+*(Note: This requires the package to be uploaded to PyPI by the developers.)*
+
+### Option 2: Install from a local directory (For developers or from source)
+
+If you have cloned the `pyneurorg` repository or have the source code:
+
+1.  **Navigate to the top-level `pyneurorg` project directory in your terminal** (this is the directory that contains the `setup.py` file and the `src/` folder).
+    ```bash
+    cd path/to/your/pyneurorg_project_root
+    ```
+
+2.  **(Recommended) Create and activate a virtual environment:**
+    ```bash
+    python -m venv venv_pyneurorg
+    source venv_pyneurorg/bin/activate  # On macOS/Linux
+    # .\venv_pyneurorg\Scripts\activate  # On Windows
+    ```
+
+3.  **Install `pyneurorg` in editable mode and its dependencies:**
+    The `-e` flag installs the package in "editable" mode. The `.` tells pip to look for `setup.py` in the current directory.
+    ```bash
+    pip install -e .
+    ```
+    This command reads `setup.py` (which should be configured for the `src/` layout) and installs dependencies listed in `setup.py` (which ideally reads them from `requirements.txt`).
+
+    For a full development setup, including tools for testing, linting, and documentation:
+    ```bash
+    pip install -r requirements-dev.txt
+    ```
+    Or, if you have defined extras in your `setup.py` (e.g., `dev`, `docs`, `test`):
+    ```bash
+    pip install -e .[dev,docs,test]
+    ```
+
+## Usage
+
+Refer to the Quickstart Examples or to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions. Start with `00_Installation_and_Setup.ipynb`.
+
+
+
 ## Project Directory Structure
 
 The `pyneurorg` project is organized with a clear separation between the installable package code, documentation, examples, and tests. The main package code resides within the `src/` directory.
@@ -386,55 +437,6 @@ The `examples/` directory provides a guided tour through `pyneurorg`'s features:
 *   **`13_Inferring_Functional_Networks_from_Calcium_Data.ipynb`**: Similar to the above, but demonstrates inferring functional networks from simulated calcium imaging data.
 *   **`14_Advanced_Analysis_Bursting_and_Synchrony.ipynb`**: Covers more advanced analysis techniques, such as detecting bursting patterns in neuronal activity and quantifying network synchrony.
 *   **`15_Example_Modeling_a_Simplified_Disease_Phenotype.ipynb`**: Provides an example of how `pyneurorg` can be used to model and investigate network alterations associated with a simplified disease phenotype.
-
-## Installation
-
-There are two primary ways to install `pyneurorg`:
-
-### Option 1: Install from PyPI (Recommended for users)
-
-If `pyneurorg` is published on the Python Package Index (PyPI), you can install it directly using `pip`. This is the simplest method for end-users.
-
-```bash
-pip install pyneurorg
-```
-*(Note: This requires the package to be uploaded to PyPI by the developers.)*
-
-### Option 2: Install from a local directory (For developers or from source)
-
-If you have cloned the `pyneurorg` repository or have the source code:
-
-1.  **Navigate to the top-level `pyneurorg` project directory in your terminal** (this is the directory that contains the `setup.py` file and the `src/` folder).
-    ```bash
-    cd path/to/your/pyneurorg_project_root
-    ```
-
-2.  **(Recommended) Create and activate a virtual environment:**
-    ```bash
-    python -m venv venv_pyneurorg
-    source venv_pyneurorg/bin/activate  # On macOS/Linux
-    # .\venv_pyneurorg\Scripts\activate  # On Windows
-    ```
-
-3.  **Install `pyneurorg` in editable mode and its dependencies:**
-    The `-e` flag installs the package in "editable" mode. The `.` tells pip to look for `setup.py` in the current directory.
-    ```bash
-    pip install -e .
-    ```
-    This command reads `setup.py` (which should be configured for the `src/` layout) and installs dependencies listed in `setup.py` (which ideally reads them from `requirements.txt`).
-
-    For a full development setup, including tools for testing, linting, and documentation:
-    ```bash
-    pip install -r requirements-dev.txt
-    ```
-    Or, if you have defined extras in your `setup.py` (e.g., `dev`, `docs`, `test`):
-    ```bash
-    pip install -e .[dev,docs,test]
-    ```
-
-## Usage
-
-Refer to the Jupyter Notebooks in the `examples/` directory for detailed usage instructions. Start with `00_Installation_and_Setup.ipynb`.
 
 
 ## License
