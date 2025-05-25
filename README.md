@@ -1,10 +1,5 @@
 
-
-# pybrainorg
-
-# Python Brain Organoid Simulator
-
-=======
+![logo](logo.png)
 
 **pybrainorg** is a Python module designed for simulating brain organoids, leveraging the power and flexibility of the Brian2 spiking neural network simulator. It provides a structured framework to model neurons and synapses within organoids, simulate their development and activity, and interact with them using simulated Microelectrode Arrays (MEAs) and calcium imaging techniques.
 
