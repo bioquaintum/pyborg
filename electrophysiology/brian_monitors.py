@@ -1,10 +1,10 @@
-# pybrainorg/electrophysiology/brian_monitors.py
+# pyneurorg/electrophysiology/brian_monitors.py
 
 """
 Helper functions for creating and configuring Brian2 monitors.
 
 These functions simplify the setup of common monitors like SpikeMonitor,
-StateMonitor, and PopulationRateMonitor for pybrainorg simulations.
+StateMonitor, and PopulationRateMonitor for pyneurorg simulations.
 """
 
 import brian2 as b2
@@ -36,7 +36,7 @@ def setup_spike_monitor(source, record=True, name=None, **kwargs):
     Examples
     --------
     >>> from brian2 import NeuronGroup, SpikeMonitor, run, ms
-    >>> from pybrainorg.electrophysiology.brian_monitors import setup_spike_monitor
+    >>> from pyneurorg.electrophysiology.brian_monitors import setup_spike_monitor
     >>> G = NeuronGroup(10, 'dv/dt = -v/(10*ms) : 1', threshold='v>1', reset='v=0', method='exact')
     >>> G.v = 1.1 # Make them spike
     >>> spikemon = setup_spike_monitor(G, name="my_spikes")
@@ -81,7 +81,7 @@ def setup_state_monitor(source, variables, record=True, dt=None, name=None, **kw
     Examples
     --------
     >>> from brian2 import NeuronGroup, StateMonitor, run, ms, mV
-    >>> from pybrainorg.electrophysiology.brian_monitors import setup_state_monitor
+    >>> from pyneurorg.electrophysiology.brian_monitors import setup_state_monitor
     >>> G = NeuronGroup(1, 'dv/dt = (1-v)/(10*ms) : 1 (unless refractory)', threshold='v>0.8', reset='v=0', refractory=5*ms, method='exact')
     >>> G.v = 0
     >>> statemon = setup_state_monitor(G, 'v', name="my_vm_trace", dt=0.1*ms)
@@ -118,7 +118,7 @@ def setup_population_rate_monitor(source, name=None, **kwargs):
     Examples
     --------
     >>> from brian2 import NeuronGroup, PopulationRateMonitor, run, ms, Hz
-    >>> from pybrainorg.electrophysiology.brian_monitors import setup_population_rate_monitor
+    >>> from pyneurorg.electrophysiology.brian_monitors import setup_population_rate_monitor
     >>> G = NeuronGroup(100, 'dv/dt = -v/(10*ms) : 1', threshold='v>1', reset='v=0', method='exact')
     >>> G.v = 'rand()*1.5' # Some initial spread
     >>> ratemon = setup_population_rate_monitor(G, name="my_pop_rate")
