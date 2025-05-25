@@ -1,7 +1,7 @@
-# pybrainorg/organoid/organoid.py
+# pyneurorg/organoid/organoid.py
 
 """
-Defines the main Organoid class for pybrainorg simulations.
+Defines the main Organoid class for pyneurorg simulations.
 
 The Organoid class acts as a container and manager for Brian2 NeuronGroup
 and Synapses objects, along with their spatial properties.
@@ -9,7 +9,7 @@ and Synapses objects, along with their spatial properties.
 
 import brian2 as b2
 import numpy as np
-# Importar modelos e funções espaciais dos outros módulos do pybrainorg
+# Importar modelos e funções espaciais dos outros módulos do pyneurorg
 from ..core import neuron_models as pbg_neuron_models # Usando alias para evitar conflito de nomes
 from ..core import synapse_models as pbg_synapse_models
 from . import spatial as pbg_spatial
@@ -25,7 +25,7 @@ class Organoid:
     Parameters
     ----------
     name : str, optional
-        A descriptive name for the organoid instance (default: "pybrainorg_organoid").
+        A descriptive name for the organoid instance (default: "pyneurorg_organoid").
     default_brian2_prefs : dict, optional
         A dictionary of Brian2 preferences to apply at the start of simulations
         involving this organoid. E.g., {'core.default_float_dtype': float64}.
@@ -48,7 +48,7 @@ class Organoid:
         a `brian2.Network` object.
     """
 
-    def __init__(self, name="pybrainorg_organoid", default_brian2_prefs=None):
+    def __init__(self, name="pyneurorg_organoid", default_brian2_prefs=None):
         """
         Initializes a new Organoid instance.
         """
@@ -78,7 +78,7 @@ class Organoid:
         num_neurons : int
             The number of neurons in this group.
         model_name : str
-            The name of the neuron model function to use from `pybrainorg.core.neuron_models`
+            The name of the neuron model function to use from `pyneurorg.core.neuron_models`
             (e.g., "LIFNeuron", "IzhikevichNeuron").
         model_params : dict, optional
             A dictionary of parameters to pass to the neuron model function.
@@ -89,7 +89,7 @@ class Organoid:
             Must have length units (e.g., b2.um).
         spatial_distribution_func : str, optional
             The name of the spatial distribution function to use from
-            `pybrainorg.organoid.spatial` (e.g., "random_positions_in_cube").
+            `pyneurorg.organoid.spatial` (e.g., "random_positions_in_cube").
             Ignored if `positions` is provided.
         spatial_params : dict, optional
             A dictionary of parameters to pass to the `spatial_distribution_func`.
@@ -126,7 +126,7 @@ class Organoid:
         try:
             model_func = getattr(pbg_neuron_models, model_name)
         except AttributeError:
-            raise ValueError(f"Neuron model function '{model_name}' not found in pybrainorg.core.neuron_models.")
+            raise ValueError(f"Neuron model function '{model_name}' not found in pyneurorg.core.neuron_models.")
         
         model_def = model_func(**model_params)
 
@@ -148,7 +148,7 @@ class Organoid:
             try:
                 spatial_func = getattr(pbg_spatial, spatial_distribution_func)
             except AttributeError:
-                raise ValueError(f"Spatial distribution function '{spatial_distribution_func}' not found in pybrainorg.organoid.spatial.")
+                raise ValueError(f"Spatial distribution function '{spatial_distribution_func}' not found in pyneurorg.organoid.spatial.")
             neuron_positions = spatial_func(**spatial_params)
         else:
             # Default: place at origin if no spatial info given (or raise error)
@@ -215,7 +215,7 @@ class Organoid:
         post_group_name : str
             Name of the postsynaptic neuron group.
         model_name : str
-            Name of the synapse model function from `pybrainorg.core.synapse_models`.
+            Name of the synapse model function from `pyneurorg.core.synapse_models`.
         model_params : dict, optional
             Parameters to pass to the synapse model function.
         connect_condition : str, optional
@@ -273,7 +273,7 @@ class Organoid:
         try:
             model_func = getattr(pbg_synapse_models, model_name)
         except AttributeError:
-            raise ValueError(f"Synapse model function '{model_name}' not found in pybrainorg.core.synapse_models.")
+            raise ValueError(f"Synapse model function '{model_name}' not found in pyneurorg.core.synapse_models.")
 
         model_def = model_func(**model_params)
 
