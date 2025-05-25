@@ -1,7 +1,7 @@
-# pybrainorg/core/neuron_models.py
+# pyneurorg/core/neuron_models.py
 
 """
-Collection of predefined neuron models for use with Brian2 in pybrainorg simulations.
+Collection of predefined neuron models for use with Brian2 in pyneurorg simulations.
 
 Each function in this module returns a dictionary containing the necessary
 components (equations, parameters, threshold, reset conditions, refractory period,
